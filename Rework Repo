@@ -1,0 +1,50 @@
+//autoload file and instantiate Slim
+<?php
+require 'vendor/autoload.php';
+$app = new Slim\App();
+?>php
+
+//Creating Beer_Style Record
+$app->post('/Beer_Style', function($request){
+ require_once('RESTAPI.php');
+ $query = "INSERT INTO library (style,brand,name) VALUES (?,?,?)";
+ $stmt = $connection->prepare($query);
+ $stmt->bind_param("sss",$style,$brand,$name);
+ $style = $request->getParsedBody()['style'];
+ $brand = $request->getParsedBody()['brand'];
+ $name = $request->getParsedBody()['name'];
+  $stmt->execute();
+});
+
+//Deleting a Beer_Style Record 
+$app->delete('/Beer_Style/{style}', function($request){
+ require_once('RESTAPI.php');
+ $get_style = $request->getAttribute('style');
+ $query = "DELETE from library WHERE style = $get_style";
+ $result = $connection->query($query);
+});
+
+// Retrieving all Beer Styles
+$app->get('/Beer_Style', function() {
+ require_once('RESTAPI.php');
+ $query = "select * from library order by style";
+ $result = $connection->query($query);
+ // var_dump($result);
+ while ($row = $result->fetch_assoc()){
+$data[] = $row;
+ }
+ echo json_encode($data);
+});
+
+// Updating Beer_Style Record 
+$app->put('/Beer_Style/{style}', function($request){
+ require_once('RESTAPI.php');
+ $get_style = $request->getAttribute('style');
+ $query = "UPDATE library SET style = ?, brand = ?, name = ? WHERE style = $get_style";
+ $stmt = $connection->prepare($query);
+ $stmt->bind_param("sss",$style,$brand,$name);
+ $style = $request->getParsedBody()['style'];
+ $brand = $request->getParsedBody()['brand'];
+ $name = $request->getParsedBody()['name'];
+ $stmt->execute();
+});
